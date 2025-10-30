@@ -1,0 +1,73 @@
+erdiagram RC_Models
+
+notation=crowsfoot
+
+// Entities
+entity Customer {
+    customer_id key
+    name
+    email
+    status: VARCHAR(10)  // "potential", "interested", "previous"
+}
+
+entity Invoice {
+    invoice_id key
+    purchase_date: DATE
+    delivery_location
+    shipping_info
+    shipping_charge: DECIMAL(10,2)
+}
+
+entity Line {
+    line_id key
+    product_code
+    price: DECIMAL(10,2)
+    quantity: INTEGER
+}
+
+entity Product {
+    product_id key
+    name
+    description
+    price: DECIMAL(10,2)
+    quantity_on_hand: INTEGER
+    min_quantity: INTEGER  // For automatic order trigger
+}
+
+entity Vendor {
+    vendor_id key
+    name
+    contact_info
+}
+
+entity Order {
+    order_id key
+    order_date: DATE
+    quantity: INTEGER
+    status: VARCHAR(20)
+}
+
+// Relationships
+relationship Generates {
+    Customer[1] -> Invoice[0..N]  // Customer can have 0 or many invoices, each invoice must have exactly one customer
+}
+
+relationship Contains {
+    Invoice[1] -> Line[1..N]  // Invoice must have at least one line, each line belongs to exactly one invoice
+}
+
+relationship Has {
+    Line[N] -> Product[1]  // Line item must refer to exactly one product, product can be in many lines
+}
+
+relationship Supplies {
+    Vendor[1] -> Product[N]  // Each product must have exactly one vendor, vendor can supply many products
+}
+
+relationship Fills {
+    Vendor[1] -> Order[N]  // Each order must be filled by exactly one vendor, vendor can fill many orders
+}
+
+relationship Requests {
+    Order[N] -> Product[1]  // Each order must request exactly one product, product can be requested by many orders
+}
